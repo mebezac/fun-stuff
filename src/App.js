@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 
 function App() {
   const [playerNames, setPlayerNames] = useState([]);
+  const [redPlayerNames, setRedPlayerNames] = useState([]);
   const [bluePlayerName, setBluePlayerName] = useState('');
   const [playerName, setPlayerName] = useState('');
 
@@ -13,6 +14,14 @@ function App() {
     setPlayerName('');
   }
 
+  const handleRedPlayerFlip = (playerName) => {
+    setRedPlayerNames(
+      redPlayerNames.includes(playerName)
+        ? redPlayerNames.filter((name) => name !== playerName)
+        : [...redPlayerNames, playerName]
+    );
+  };
+
   return (
     <>
       <div className="navbar bg-primary text-primary-content">
@@ -20,7 +29,10 @@ function App() {
           Sounds Fishy Scorer 🎏
         </span>
 
-        <button className="btn btn-ghost normal-case text-xl" onClick={() => setBluePlayerName('Zac')}>
+        <button
+          className="btn btn-ghost normal-case text-xl"
+          onClick={() => setBluePlayerName('Zac')}
+        >
           {bluePlayerName} is blue
         </button>
       </div>
@@ -53,10 +65,16 @@ function App() {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6 justify-center">
           {playerNames.map((playerName) => (
-            <Player key={bluePlayerName} bluePlayerName={bluePlayerName} playerName={playerName} />
+            <Player
+              key={playerName}
+              bluePlayerName={bluePlayerName}
+              playerName={playerName}
+              handleRedPlayerFlip={handleRedPlayerFlip}
+            />
           ))}
         </div>
       </div>
+      <span>The Red players are: {redPlayerNames}</span>
     </>
   );
 }
