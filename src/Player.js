@@ -7,6 +7,7 @@ function Player({
   bluePlayerName,
   handleRedPlayerFlip,
   handlePlayerUnFlip,
+  guesserName,
   playerName,
   redPlayerNames
 }) {
@@ -14,6 +15,7 @@ function Player({
   const [flippedState, setFlippedState] = useState('unflipped');
 
   const handleClick = () => {
+    if (!guesserName) return;
     if (flippedState === 'unflipped') {
       handleRedPlayerFlip(playerName);
     } else {

@@ -2,8 +2,9 @@ import './App.css';
 import BlueFishModal from './Modals/BlueFishModal';
 import ChooseGuesserModal from './Modals/ChooseGuesserModal';
 import DeleteFishModal from './Modals/DeleteFishModal';
+import ScoreModal from './Modals/ScoreModal';
 import Player from './Player';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   BottomNavigation,
   Button,
@@ -18,6 +19,7 @@ import { GiFishingHook } from 'react-icons/gi';
 function App() {
   const [bluePlayerName, setBluePlayerName] = useState('');
   const [guesserName, setGuesserName] = useState('');
+  const [guesserStopped, setGuesserStopped] = useState(false);
   const [openModal, setOpenModal] = useState('');
   const [playerName, setPlayerName] = useState('');
   const [playerNames, setPlayerNames] = useState([]);
@@ -46,6 +48,7 @@ function App() {
   const handleReset = () => {
     setBluePlayerName('');
     setGuesserName('');
+    setGuesserStopped(false);
     setPlayerName('');
     setRedPlayerNames([]);
   };
@@ -67,15 +70,25 @@ function App() {
     }
   };
 
+  const scores = () => {
+    return {
+      red: redPlayerNames.length,
+      blue: guesserStopped ? 0 : unflippedPlayerNames().length,
+      guesser: guesserStopped ? redPlayerNames.length : 0
+    };
+  }
+
   const unflippedPlayerNames = () => {
     return guessablePlayerNames().filter((name) => !redPlayerNames.includes(name));
   };
 
   useEffect(() => {
-    if (bluePlayerName || playerNames.length === 0) {
-      setOpenModal('');
-    }
-  }, [bluePlayerName, playerNames]);
+    bluePlayerName && setOpenModal('score');
+  }, [bluePlayerName]);
+
+  useEffect(() => {
+    playerNames.length === 0 && setOpenModal('');
+  }, [playerNames]);
 
   const escFunction = useCallback((event) => {
     if (event.keyCode === 27) {
@@ -124,23 +137,27 @@ function App() {
         </Form>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6 justify-center">
           {guessablePlayerNames().map((playerName) => (
-              <Player
-                key={playerName}
-                bluePlayerName={bluePlayerName}
-                playerName={playerName}
-                handlePlayerUnFlip={handlePlayerUnFlip}
-                handleRedPlayerFlip={handleRedPlayerFlip}
-                redPlayerNames={redPlayerNames}
-                setBluePlayerName={setBluePlayerName}
-              />
-            ))}
+            <Player
+              key={playerName}
+              bluePlayerName={bluePlayerName}
+              playerName={playerName}
+              guesserName={guesserName}
+              handlePlayerUnFlip={handlePlayerUnFlip}
+              handleRedPlayerFlip={handleRedPlayerFlip}
+              redPlayerNames={redPlayerNames}
+              setBluePlayerName={setBluePlayerName}
+            />
+          ))}
         </div>
       </div>
       <BlueFishModal
         bluePlayerName={bluePlayerName}
         handleModalClose={handleModalClose}
+        guesserName={guesserName}
+        guesserStopped={guesserStopped}
         openModal={openModal}
         setBluePlayerName={setBluePlayerName}
+        setGuesserStopped={setGuesserStopped}
         unflippedPlayerNames={unflippedPlayerNames}
       />
       <DeleteFishModal
@@ -155,6 +172,15 @@ function App() {
         openModal={openModal}
         playerNames={playerNames}
       />
+      <ScoreModal
+        bluePlayerName={bluePlayerName}
+        guesserName={guesserName}
+        handleModalClose={handleModalClose}
+        openModal={openModal}
+        playerNames={playerNames}
+        redPlayerNames={redPlayerNames}
+        scores={scores}
+      />
       <BottomNavigation>
         <button
           className="hover:bg-success-content"
@@ -166,7 +192,11 @@ function App() {
         </button>
         <button
           className="active hover:bg-blue-500"
-          disabled={!guesserName || bluePlayerName}
+          disabled={
+            !guesserName ||
+            bluePlayerName ||
+            guessablePlayerNames().length === 0
+          }
           onClick={() => setOpenModal('blueFish')}
         >
           <IoFish className="text-blue-400" />
