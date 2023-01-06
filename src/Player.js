@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from 'react';
+import {
+  Alert,
+} from 'react-daisyui';
 
-function Player({ bluePlayerName, handleRedPlayerFlip, playerName }) {
+function Player({ bluePlayerName, handleRedPlayerFlip, handleRedPlayerUnFlip, playerName }) {
   const [bgColor, setBgColor] = useState('bg-neutral');
   const [flippedState, setFlippedState] = useState('unflipped');
 
   const handleClick = () => {
     setFlippedState(flippedState === 'unflipped' ? 'red' : 'unflipped');
-    handleRedPlayerFlip(playerName);
+    if (flippedState === 'unflipped') {
+      setFlippedState('red');
+      handleRedPlayerFlip(playerName);
+    } else {
+      setFlippedState('unflipped');
+      handleRedPlayerUnFlip(playerName);
+    }
   };
 
   useEffect(() => {
@@ -25,12 +34,9 @@ function Player({ bluePlayerName, handleRedPlayerFlip, playerName }) {
 
   return (
     <>
-      <div
-        className={`alert ${bgColor} transition-colors`}
-        onClick={handleClick}
-      >
+      <Alert className={`alert ${bgColor} transition-colors`} onClick={handleClick}>
         <span className="text-xl text-white">{playerName}</span>
-      </div>
+      </Alert>
     </>
   );
 }
