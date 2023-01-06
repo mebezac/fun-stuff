@@ -3,18 +3,21 @@ import {
   Alert,
 } from 'react-daisyui';
 
-function Player({ bluePlayerName, handleRedPlayerFlip, handleRedPlayerUnFlip, playerName }) {
+function Player({
+  bluePlayerName,
+  handleRedPlayerFlip,
+  handlePlayerUnFlip,
+  playerName,
+  redPlayerNames
+}) {
   const [bgColor, setBgColor] = useState('bg-neutral');
   const [flippedState, setFlippedState] = useState('unflipped');
 
   const handleClick = () => {
-    setFlippedState(flippedState === 'unflipped' ? 'red' : 'unflipped');
     if (flippedState === 'unflipped') {
-      setFlippedState('red');
       handleRedPlayerFlip(playerName);
     } else {
-      setFlippedState('unflipped');
-      handleRedPlayerUnFlip(playerName);
+      handlePlayerUnFlip(playerName);
     }
   };
 
@@ -29,8 +32,14 @@ function Player({ bluePlayerName, handleRedPlayerFlip, handleRedPlayerUnFlip, pl
   }, [flippedState]);
 
   useEffect(() => {
-    bluePlayerName === playerName && setFlippedState('blue');
-  }, [bluePlayerName, playerName]);
+    if (redPlayerNames.includes(playerName)) {
+      setFlippedState('red');
+    } else if (bluePlayerName === playerName) {
+      setFlippedState('blue');
+    } else {
+      setFlippedState('unflipped');
+    }
+  }, [bluePlayerName, playerName, redPlayerNames]);
 
   return (
     <>
