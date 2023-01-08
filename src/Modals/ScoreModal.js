@@ -11,19 +11,11 @@ function ScoreModal({
   handleModalClose,
   guesserName,
   openModal,
-  playerNames,
   redPlayerNames,
-  scores
+  scores,
+  unflippedPlayerNames
 }) {
   const [modalOpen, setModalOpen] = useState(false);
-
-  const unflippedPlayerNames = () => {
-    return playerNames.filter(playerName => !flippedPlayerNames().includes(playerName));
-  }
-
-  const flippedPlayerNames = () => {
-    return [bluePlayerName, ...redPlayerNames, guesserName];
-  }
 
   useEffect(() => {
     if (openModal === 'score') {
@@ -35,15 +27,15 @@ function ScoreModal({
 
   return (
     <Modal
+      className='w-11/12 max-w-5xl'
       open={modalOpen}
       onClickBackdrop={() => handleModalClose()}
-      responsive={true}
     >
       <Modal.Header className="font-bold">
         Scores 🎉
       </Modal.Header>
       <Modal.Body>
-        <Table compact={true}>
+        <Table compact={true} className='w-full'>
           <Table.Head>
             <span>Name</span>
             <span>Score</span>
@@ -60,18 +52,18 @@ function ScoreModal({
               <span>{scores().blue}</span>
               <span>Blue <IoFish className='text-blue-400' /></span>
             </Table.Row>
+            {unflippedPlayerNames.map((playerName) => (
+              <Table.Row key={playerName}>
+                <span>{playerName}</span>
+                <span>{scores().red}</span>
+                <span>Unflipped Red <IoFish className='text-red-400' /></span>
+              </Table.Row>
+            ))}
             {redPlayerNames.map((playerName) => (
               <Table.Row key={playerName}>
                 <span>{playerName}</span>
                 <span>0</span>
-                <span>Red <IoFish className='text-red-400' /></span>
-              </Table.Row>
-            ))}
-            {unflippedPlayerNames().map((playerName) => (
-              <Table.Row key={playerName}>
-                <span>{playerName}</span>
-                <span>{scores().red}</span>
-                <span>Red <IoFish className='text-red-400' /></span>
+                <span>Flipped Red <IoFish className='text-red-400' /></span>
               </Table.Row>
             ))}
           </Table.Body>

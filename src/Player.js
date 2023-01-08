@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
+  Button
 } from 'react-daisyui';
+import { IoTrashSharp } from 'react-icons/io5';
 
 function Player({
   bluePlayerName,
-  handleRedPlayerFlip,
+  gameState,
+  handlePlayerRemove,
   handlePlayerUnFlip,
-  guesserName,
+  handleRedPlayerFlip,
   playerName,
   redPlayerNames
 }) {
@@ -15,7 +18,7 @@ function Player({
   const [flippedState, setFlippedState] = useState('unflipped');
 
   const handleClick = () => {
-    if (!guesserName) return;
+    if (gameState !== 'roundStarted') return;
     if (flippedState === 'unflipped') {
       handleRedPlayerFlip(playerName);
     } else {
@@ -45,8 +48,20 @@ function Player({
 
   return (
     <>
-      <Alert className={`alert ${bgColor} transition-colors`} onClick={handleClick}>
-        <span className="text-xl text-white">{playerName}</span>
+      <Alert
+        className={`alert ${bgColor} transition-colors`}
+        innerClassName="justify-between min-w-[85%] text-xl"
+        onClick={handleClick}
+      >
+        <span className="text-white">{playerName}</span>
+        {gameState === 'addPlayers' && (
+          <Button className="block">
+            <IoTrashSharp
+              className="text-warning"
+              onClick={() => handlePlayerRemove(playerName)}
+            />
+          </Button>
+        )}
       </Alert>
     </>
   );

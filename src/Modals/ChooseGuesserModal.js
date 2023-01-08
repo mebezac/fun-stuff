@@ -2,7 +2,6 @@ import {
   Alert,
   Modal,
 } from 'react-daisyui';
-import { IoFish } from 'react-icons/io5';
 import { useEffect, useState } from 'react';
 
 function ChooseGuesserModal({handleGuesserChosen, handleModalClose, openModal, playerNames}) {
@@ -23,7 +22,7 @@ function ChooseGuesserModal({handleGuesserChosen, handleModalClose, openModal, p
       responsive={true}
     >
       <Modal.Header className="font-bold">
-        Which <IoFish className="text-white inline" /> is guessing?
+        Who is guessing?
       </Modal.Header>
       <Modal.Body>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 justify-center">
