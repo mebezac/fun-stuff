@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Fish Scorer",
+  "name": "Sounds Fishy Scorer",
   "icons": [
     {
       "src": "favicon.ico",
