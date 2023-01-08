@@ -172,7 +172,7 @@ function App() {
       <Navbar
         className={'shadow-xl rounded-box bg-primary text-primary-content'}
       >
-        <Button className="text-xl" color="ghost">
+        <Button className="text-xl normal-case" color="ghost">
           Sounds Fishy Scorer 🎏
         </Button>
       </Navbar>
