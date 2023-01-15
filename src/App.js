@@ -3,7 +3,7 @@ import BlueFishModal from './Modals/BlueFishModal';
 import ChooseGuesserModal from './Modals/ChooseGuesserModal';
 import ScoreModal from './Modals/ScoreModal';
 import Player from './Player';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   BottomNavigation,
   Button,
@@ -27,6 +27,8 @@ function App() {
   const [playerNames, setPlayerNames] = useState([]);
   const [redPlayerNames, setRedPlayerNames] = useState([]);
   const [unflippedPlayerNames, setUnflippedPlayerNames] = useState([]);
+
+  const inputEl = useRef(null);
 
   const bottomButton = () => {
     if (gameState === 'addPlayers') {
@@ -103,6 +105,7 @@ function App() {
     event.preventDefault();
     setPlayerNames([...playerNames, playerName]);
     setPlayerName('');
+    inputEl.current.focus();
   };
 
   const guesserScore = () => {
@@ -184,6 +187,7 @@ function App() {
               type="text"
               placeholder="Player name ..."
               value={playerName}
+              ref={inputEl}
               required
               onChange={(e) => setPlayerName(e.target.value)}
             />
