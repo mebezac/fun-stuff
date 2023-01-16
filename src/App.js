@@ -3,7 +3,8 @@ import BlueFishModal from './Modals/BlueFishModal';
 import ChooseGuesserModal from './Modals/ChooseGuesserModal';
 import ScoreModal from './Modals/ScoreModal';
 import Player from './Player';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import useLocalStorageState from './utils'
+import { useCallback, useEffect, useRef } from 'react';
 import {
   BottomNavigation,
   Button,
@@ -17,16 +18,16 @@ import { GiFishingHook } from 'react-icons/gi';
 import { MdAutorenew } from 'react-icons/md';
 
 function App() {
-  const [bluePlayerName, setBluePlayerName] = useState('');
-  const [gameState, setGameState] = useState('addPlayers');
-  const [guessablePlayerNames, setGuessablePlayerNames] = useState([]);
-  const [guesserName, setGuesserName] = useState('');
-  const [guesserStopped, setGuesserStopped] = useState(false);
-  const [openModal, setOpenModal] = useState('');
-  const [playerName, setPlayerName] = useState('');
-  const [playerNames, setPlayerNames] = useState([]);
-  const [redPlayerNames, setRedPlayerNames] = useState([]);
-  const [unflippedPlayerNames, setUnflippedPlayerNames] = useState([]);
+  const [bluePlayerName, setBluePlayerName] = useLocalStorageState('bluePlayerName', '');
+  const [gameState, setGameState] = useLocalStorageState('gameState', 'addPlayers');
+  const [guessablePlayerNames, setGuessablePlayerNames] = useLocalStorageState('guessablePlayerNames', []);
+  const [guesserName, setGuesserName] = useLocalStorageState('guesserName', '');
+  const [guesserStopped, setGuesserStopped] = useLocalStorageState('guesserStopped', false);
+  const [openModal, setOpenModal] = useLocalStorageState('openModal', '');
+  const [playerName, setPlayerName] = useLocalStorageState('playerName', '');
+  const [playerNames, setPlayerNames] = useLocalStorageState('playerNames', []);
+  const [redPlayerNames, setRedPlayerNames] = useLocalStorageState('redPlayerNames', []);
+  const [unflippedPlayerNames, setUnflippedPlayerNames] = useLocalStorageState('unflippedPlayerNames', []);
 
   const inputEl = useRef(null);
 
@@ -56,7 +57,7 @@ function App() {
       return (
         <button
           className="hover:bg-success-content"
-          onClick={() => handleReset()}
+          onClick={() => handleNewRound()}
         >
           <MdAutorenew className="text-success" />
           <h1 className="text-xl text-success">New Round</h1>
@@ -71,6 +72,15 @@ function App() {
   };
 
   const handleModalClose = () => setOpenModal('');
+
+  const handleNewRound = () => {
+    setBluePlayerName('');
+    setGameState('addPlayers');
+    setGuesserName('');
+    setGuesserStopped(false);
+    setPlayerName('');
+    setRedPlayerNames([]);
+  };
 
   const handlePlayerRemove = (playerName) => {
     setPlayerNames(playerNames.filter((name) => name !== playerName));
@@ -93,12 +103,12 @@ function App() {
   };
 
   const handleReset = () => {
-    setBluePlayerName('');
-    setGameState('addPlayers');
-    setGuesserName('');
-    setGuesserStopped(false);
-    setPlayerName('');
-    setRedPlayerNames([]);
+    if (window.confirm('Are you sure you want to reset everything?')) {
+      handleNewRound();
+      setGuessablePlayerNames([]);
+      setOpenModal('');
+      setPlayerNames([]);
+    }
   };
 
   const handleSubmit = (event) => {
@@ -125,11 +135,20 @@ function App() {
 
   useEffect(() => {
     bluePlayerName && setGameState('roundEnded');
-  }, [bluePlayerName]);
+  }, [bluePlayerName, setGameState]);
 
   useEffect(() => {
-    setUnflippedPlayerNames(guessablePlayerNames.filter((name) => !redPlayerNames.includes(name) && name !== bluePlayerName));
-  }, [bluePlayerName, guessablePlayerNames, redPlayerNames]);
+    setUnflippedPlayerNames(
+      guessablePlayerNames.filter(
+        (name) => !redPlayerNames.includes(name) && name !== bluePlayerName
+      )
+    );
+  }, [
+    bluePlayerName,
+    guessablePlayerNames,
+    redPlayerNames,
+    setUnflippedPlayerNames,
+  ]);
 
   useEffect(() => {
     switch (gameState) {
@@ -148,20 +167,35 @@ function App() {
       default:
         break;
     }
-  }, [gameState, unflippedPlayerNames]);
+  }, [
+    gameState,
+    setBluePlayerName,
+    setGuesserStopped,
+    setOpenModal,
+    unflippedPlayerNames,
+  ]);
 
   useEffect(() => {
     setGuessablePlayerNames(playerNames.filter((name) => name !== guesserName));
     if (gameState === 'addPlayers' && guesserName) {
       setGameState('roundStarted');
     }
-  }, [gameState, guesserName, playerNames]);
+  }, [
+    gameState,
+    guesserName,
+    playerNames,
+    setGameState,
+    setGuessablePlayerNames,
+  ]);
 
-  const escFunction = useCallback((event) => {
-    if (event.keyCode === 27) {
-      setOpenModal('');
-    }
-  }, []);
+  const escFunction = useCallback(
+    (event) => {
+      if (event.keyCode === 27) {
+        setOpenModal('');
+      }
+    },
+    [setOpenModal]
+  );
 
   useEffect(() => {
     document.addEventListener('keydown', escFunction);
