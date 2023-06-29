@@ -43,17 +43,7 @@ function App() {
           <h1 className="text-xl text-success">Start Round</h1>
         </button>
       );
-    } else if (gameState === 'roundStarted') {
-      return (
-        <button
-          className="hover:bg-blue-600"
-          onClick={() => setGameState('determineIfGuesserStopped')}
-        >
-          <IoFish className="text-blue-400" />
-          <h1 className="text-xl text-blue-400">End Round</h1>
-        </button>
-      );
-    } else {
+    } else if (gameState === 'roundEnded') {
       return (
         <button
           className="hover:bg-success-content"
@@ -61,6 +51,16 @@ function App() {
         >
           <MdAutorenew className="text-success" />
           <h1 className="text-xl text-success">New Round</h1>
+        </button>
+      );
+    } else {
+      return (
+        <button
+          className="hover:bg-blue-600"
+          onClick={() => setGameState('determineIfGuesserStopped')}
+        >
+          <IoFish className="text-blue-400" />
+          <h1 className="text-xl text-blue-400">End Round</h1>
         </button>
       );
     }
