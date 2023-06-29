@@ -26,6 +26,7 @@ function App() {
   const [openModal, setOpenModal] = useLocalStorageState('openModal', '');
   const [playerName, setPlayerName] = useLocalStorageState('playerName', '');
   const [playerNames, setPlayerNames] = useLocalStorageState('playerNames', []);
+  const [playerScores, setPlayerScores] = useLocalStorageState('playerScores', {});
   const [redPlayerNames, setRedPlayerNames] = useLocalStorageState('redPlayerNames', []);
   const [unflippedPlayerNames, setUnflippedPlayerNames] = useLocalStorageState('unflippedPlayerNames', []);
 
@@ -84,6 +85,9 @@ function App() {
 
   const handlePlayerRemove = (playerName) => {
     setPlayerNames(playerNames.filter((name) => name !== playerName));
+    const newPlayerScores = { ...playerScores };
+    delete newPlayerScores[playerName];
+    setPlayerScores(newPlayerScores);
     if (bluePlayerName === playerName) {
       setBluePlayerName('');
     } else if (guesserName === playerName) {
@@ -108,30 +112,19 @@ function App() {
       setGuessablePlayerNames([]);
       setOpenModal('');
       setPlayerNames([]);
+      setPlayerScores({});
     }
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
     setPlayerNames([...playerNames, playerName]);
+    const newPlayerScores = { ...playerScores };
+    newPlayerScores[playerName] = {current: 0, total: 0};
+    setPlayerScores(newPlayerScores);
     setPlayerName('');
     inputEl.current.focus();
   };
-
-  const guesserScore = () => {
-    if (guesserStopped) {
-      return unflippedPlayerNames.length === 1 ? redPlayerNames.length : redPlayerNames.length + 1;
-    }
-    return 0;
-  }
-
-  const scores = () => {
-    return {
-      red: redPlayerNames.length,
-      blue: guesserStopped ? 0 : unflippedPlayerNames.length,
-      guesser: guesserScore(),
-    };
-  }
 
   useEffect(() => {
     bluePlayerName && setGameState('roundEnded');
@@ -141,7 +134,7 @@ function App() {
     setUnflippedPlayerNames(
       guessablePlayerNames.filter(
         (name) => !redPlayerNames.includes(name) && name !== bluePlayerName
-      )
+        )
     );
   }, [
     bluePlayerName,
@@ -155,16 +148,16 @@ function App() {
       case 'roundEnded':
         setOpenModal('score');
         break;
-      case 'roundStarted':
-        if (unflippedPlayerNames.length === 1) {
-          setGuesserStopped(true);
-          setBluePlayerName(unflippedPlayerNames[0]);
-        }
-        break;
-      case 'determineIfGuesserStopped':
-        setOpenModal('blueFish');
-        break;
-      default:
+        case 'roundStarted':
+          if (unflippedPlayerNames.length === 1) {
+            setGuesserStopped(true);
+            setBluePlayerName(unflippedPlayerNames[0]);
+          }
+          break;
+          case 'determineIfGuesserStopped':
+            setOpenModal('blueFish');
+            break;
+            default:
         break;
     }
   }, [
@@ -173,6 +166,47 @@ function App() {
     setGuesserStopped,
     setOpenModal,
     unflippedPlayerNames,
+  ]);
+
+  useEffect(() => {
+    if (gameState === 'roundEnded') {
+      console.log('RUNNING ROUND END');
+      setPlayerScores((prevPlayerScores) => {
+        const newPlayerScores = { ...prevPlayerScores };
+        playerNames.forEach((playerName) => {
+          let newScore = 0;
+          if (playerName === guesserName) {
+            if (guesserStopped) {
+              newScore =
+                unflippedPlayerNames.length === 1
+                  ? redPlayerNames.length
+                  : redPlayerNames.length + 1;
+            }
+          } else if (
+            !redPlayerNames.includes(playerName) &&
+            playerName !== bluePlayerName
+          ) {
+            newScore = redPlayerNames.length;
+          } else if (bluePlayerName === playerName) {
+            newScore = guesserStopped ? 0 : unflippedPlayerNames.length;
+          }
+          newPlayerScores[playerName].current = newScore;
+          newPlayerScores[playerName].total =
+            newPlayerScores[playerName].total + newScore;
+        });
+        return newPlayerScores;
+      });
+    }
+  }, [
+    bluePlayerName,
+    gameState,
+    guesserName,
+    guesserStopped,
+    playerNames,
+    redPlayerNames,
+    redPlayerNames.length,
+    setPlayerScores,
+    unflippedPlayerNames.length,
   ]);
 
   useEffect(() => {
@@ -185,7 +219,7 @@ function App() {
     guesserName,
     playerNames,
     setGameState,
-    setGuessablePlayerNames,
+    setGuessablePlayerNames
   ]);
 
   const escFunction = useCallback(
@@ -276,8 +310,8 @@ function App() {
         handleModalClose={handleModalClose}
         openModal={openModal}
         playerNames={playerNames}
+        playerScores={playerScores}
         redPlayerNames={redPlayerNames}
-        scores={scores}
         unflippedPlayerNames={unflippedPlayerNames}
       />
       <BottomNavigation>{bottomButton()}</BottomNavigation>
