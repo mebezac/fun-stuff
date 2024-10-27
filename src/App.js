@@ -314,7 +314,15 @@ function App() {
         redPlayerNames={redPlayerNames}
         unflippedPlayerNames={unflippedPlayerNames}
       />
-      <BottomNavigation>{bottomButton()}</BottomNavigation>
+      <BottomNavigation>
+        {bottomButton()}
+        <button
+          className="hover:bg-info-content"
+          onClick={() => setOpenModal('score')}
+        >
+          <h1 className="text-xl text-info">🎉 Scores</h1>
+        </button>
+      </BottomNavigation>
     </>
   );
 }

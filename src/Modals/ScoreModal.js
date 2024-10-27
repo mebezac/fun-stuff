@@ -13,7 +13,7 @@ function ScoreModal({
   openModal,
   playerScores,
   redPlayerNames,
-  unflippedPlayerNames
+  unflippedPlayerNames,
 }) {
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -39,27 +39,35 @@ function ScoreModal({
           <Table.Head>
             <span>Name</span>
             <span>Score</span>
-            <span>Role</span>
+            {guesserName && (
+              <span>Role</span>
+            )}
             <span>Total</span>
           </Table.Head>
           <Table.Body>
-            <Table.Row>
-              <span>{guesserName}</span>
-              <span>{playerScores[guesserName]?.current ?? 0}</span>
-              <span>Guesser <GiFishingHook className='text-success' /></span>
-              <span>{playerScores[guesserName]?.total ?? 0}</span>
-            </Table.Row>
-            <Table.Row>
-              <span>{bluePlayerName}</span>
-              <span>{playerScores[bluePlayerName]?.current ?? 0}</span>
-              <span>Blue <IoFish className='text-blue-400' /></span>
-              <span>{playerScores[bluePlayerName]?.total ?? 0}</span>
-            </Table.Row>
+            {guesserName && (
+              <Table.Row>
+                <span>{guesserName}</span>
+                <span>{playerScores[guesserName]?.current ?? 0}</span>
+                <span>Guesser <GiFishingHook className='text-success' /></span>
+                <span>{playerScores[guesserName]?.total ?? 0}</span>
+              </Table.Row>
+            )}
+            {bluePlayerName && (
+              <Table.Row>
+                <span>{bluePlayerName}</span>
+                <span>{playerScores[bluePlayerName]?.current ?? 0}</span>
+                <span>Blue <IoFish className='text-blue-400' /></span>
+                <span>{playerScores[bluePlayerName]?.total ?? 0}</span>
+              </Table.Row>
+            )}
             {unflippedPlayerNames.map((playerName) => (
               <Table.Row key={playerName}>
                 <span>{playerName}</span>
                 <span>{playerScores[playerName]?.current ?? 0}</span>
-                <span>Unflipped Red <IoFish className='text-red-400' /></span>
+                {guesserName && (
+                  <span>Unflipped Red <IoFish className='text-red-400' /></span>
+                )}
                 <span>{playerScores[playerName]?.total ?? 0}</span>
               </Table.Row>
             ))}
